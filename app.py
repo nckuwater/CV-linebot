@@ -5,18 +5,18 @@ from flask import Flask, jsonify, request, abort, send_file
 from dotenv import load_dotenv
 from linebot import LineBotApi, WebhookParser, WebhookHandler
 from linebot.exceptions import InvalidSignatureError
-from linebot.models import MessageEvent, TextMessage, TextSendMessage
+from linebot.models import MessageEvent, TextMessage, TextSendMessage, ImageMessage
 
 from fsm import TocMachine
 from utils import send_text_message
-import pygraphviz
 
 load_dotenv()
 
 
 def new_machine():
     return TocMachine(
-        states=["initial", "remove_bg", "gray_scale"],
+        states=["initial", "remove_bg", "gray_scale", "remove_bg_processing_img",
+                "remove_bg_wait_user_revise"],
         transitions=[
             {
                 "trigger": "trans",
@@ -37,10 +37,16 @@ def new_machine():
                 "conditions": "is_going_to_initial",
             },
             {
-                "trigger": "trans",
+                "trigger": "trans_image",
                 "source": "remove_bg",
-                "dest": "remove_bg_received_img",
-                "conditions": "is_going_to_gray_scale",
+                "dest": "remove_bg_processing_img",
+            },
+            # from revise to processing, reprocess with user input number.
+            {
+                "trigger": "trans",
+                "source": "remove_bg_wait_user_revise",
+                "dest": "remove_bg_wait_user_revise",
+                "conditions": "is_going_to_remove_bg_processing_img"
             }
         ],
         initial="initial",
@@ -148,6 +154,17 @@ def handle_message(event):
     print(f"\nFSM STATE: {machine.state}")
     print('message:', event.message.text)
     response = machine.trans(event)
+    if response is False:
+        send_text_message(event.reply_token, f"Not Entering any State: {machine.state}")
+
+
+@handler.add(MessageEvent, message=ImageMessage)
+def handle_image_message(event):
+    user_id = event.source.user_id
+    machine = get_user_machine(user_id)
+    print(f"\nFSM STATE: {machine.state}")
+    print('message:', event.message.text)
+    response = machine.trans_image(event)
     if response is False:
         send_text_message(event.reply_token, f"Not Entering any State: {machine.state}")
 
