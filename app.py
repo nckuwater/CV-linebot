@@ -14,8 +14,8 @@ from utils import send_text_message
 from cairosvg import svg2png
 
 load_dotenv()
-states = ["initial", "remove_bg", "remove_bg_processing_img",
-          "remove_bg_wait_user_revise", "gray_scale"]
+states = ["initial", "show_state", "remove_bg", "remove_bg_processing_img",
+          "remove_bg_wait_user_revise", "gray_scale", "gray_scale_process"]
 
 
 def new_machine():
@@ -27,12 +27,6 @@ def new_machine():
                 "source": "initial",
                 "dest": "remove_bg",
                 "conditions": "is_going_to_remove_bg",
-            },
-            {
-                "trigger": "trans",
-                "source": "initial",
-                "dest": "gray_scale",
-                "conditions": "is_going_to_gray_scale",
             },
             {
                 "trigger": "trans_image",
@@ -48,9 +42,26 @@ def new_machine():
             },
             {
                 "trigger": "trans",
+                "source": "initial",
+                "dest": "gray_scale",
+                "conditions": "is_going_to_gray_scale",
+            },
+            {
+                "trigger": "trans_image",
+                "source": "gray_scale",
+                "dest": "gray_scale_process",
+            },
+            {
+                "trigger": "trans",
                 "source": states.copy(),
                 "dest": "initial",
                 "conditions": "is_going_to_initial",
+            },
+            {
+                "trigger": "trans",
+                "source": states.copy(),
+                "dest": "show_state",
+                "conditions": "is_going_to_show_state",
             },
             {
                 "trigger": "go_initial",
@@ -58,7 +69,8 @@ def new_machine():
                 "dest": "initial",
             }
         ],
-        initial="initial",
+        # initial="initial",
+        initial="remove_bg",
         auto_transitions=False,
         show_conditions=True,
     )
@@ -78,6 +90,7 @@ if channel_access_token is None:
     print("Specify LINE_CHANNEL_ACCESS_TOKEN as environment variable.")
     sys.exit(1)
 # print(channel_access_token)
+base_url = os.getenv('base_url')
 
 line_bot_api = LineBotApi(channel_access_token)
 parser = WebhookParser(channel_secret)
@@ -140,19 +153,6 @@ def webhook_handler():
     # if event is MessageEvent and message is TextMessage, then echo text
     for event in events:
         pass
-        # if not isinstance(event, MessageEvent):
-        #     continue
-        # if not isinstance(event.message, TextMessage):
-        #     continue
-        # if not isinstance(event.message.text, str):
-        #     continue
-        # user_id = event.source.userId
-        # machine = get_user_machine(user_id)
-        # print(f"\nFSM STATE: {machine.state}")
-        # print(f"REQUEST BODY: \n{body}")
-        # response = machine.trans(event)
-        # if response is False:
-        #     send_text_message(event.reply_token, "Not Entering any State")
 
     return "OK"
 
@@ -172,10 +172,11 @@ def handle_message(event):
 def handle_image_message(event):
     user_id = event.source.user_id
     machine = get_user_machine(user_id)
-    print(f"\nFSM STATE: {machine.state}")
-    print('ImageMessageId:', event.message.id)
-    content_path = utils.save_event_image(event)
-    print(content_path)
+    machine.trans_image(event)
+    # print(f"\nFSM STATE: {machine.state}")
+    # print('ImageMessageId:', event.message.id)
+    # content_path = utils.save_event_image(event)
+    # print(content_path)
     # if response is False:
     #     send_text_message(event.reply_token, f"Not Entering any State: {machine.state}")
 

@@ -8,6 +8,10 @@ def read_path(path):
     return cv.imread(path)
 
 
+def write_path(path, img):
+    return cv.imwrite(path, img)
+
+
 def generate_image_background_mask(image, kernel_size=7):
     """ Apply Gaussian filter """
     # image = image.resize((image.size[0]*2, image.size[1]*2))
@@ -83,7 +87,7 @@ def generate_image_background_mask(image, kernel_size=7):
     return bg_mask_uint8  # A single tunnel 0,255 image
 
 
-def apply_transparent_mask(img, mask, fill_color=(0.0, 0.0, 1.0)):
+def apply_transparent_mask(img, mask, fill_color=(0.0, 1.0, 0)):
     # img : rgb
     # mask: 1dim 255 mask, 1=remain, 0=replace by fill_color
     mask_stack = np.dstack([mask] * 3)  # Create 3-channel alpha mask
@@ -92,3 +96,7 @@ def apply_transparent_mask(img, mask, fill_color=(0.0, 0.0, 1.0)):
     masked = (mask_stack * img[:, :, :3]) + ((1 - mask_stack) * fill_color)
     masked = (masked * 255).astype('uint8')
     return masked
+
+
+def to_gray_scale(img):
+    return cv.cvtColor(img, cv.COLOR_RGB2GRAY)

@@ -4,14 +4,15 @@ from dotenv import load_dotenv
 import requests
 from linebot import LineBotApi, WebhookParser
 from linebot.models import MessageEvent, TextMessage, TextSendMessage, ImageSendMessage
+
 load_dotenv()
 channel_access_token = os.getenv("LINE_CHANNEL_ACCESS_TOKEN", None)
-
 
 if channel_access_token is None:
     print('utils cannot load channel_access_token')
     exit(-1)
 line_bot_api = LineBotApi(channel_access_token)
+base_url = os.getenv('base_url')
 
 
 def send_text_message(reply_token, text):
@@ -35,8 +36,14 @@ def save_event_image(event, fext='jpg'):
     return content_path
 
 
-def send_image(reply_token, image):
-    line_bot_api.reply_message(reply_token, ImageSendMessage())
+def send_image(reply_token, image_url):
+    line_bot_api.reply_message(reply_token, ImageSendMessage(
+        original_content_url=image_url,
+        preview_image_url=image_url))
+
+
+def resolve_static_url(path):
+    return base_url + '/' + path
 
 
 """
