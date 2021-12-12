@@ -7,16 +7,20 @@ from linebot import LineBotApi, WebhookParser, WebhookHandler
 from linebot.exceptions import InvalidSignatureError
 from linebot.models import MessageEvent, TextMessage, TextSendMessage, ImageMessage
 
+import utils
 from fsm import TocMachine
 from utils import send_text_message
 
+from cairosvg import svg2png
+
 load_dotenv()
+states = ["initial", "remove_bg", "remove_bg_processing_img",
+          "remove_bg_wait_user_revise", "gray_scale"]
 
 
 def new_machine():
     return TocMachine(
-        states=["initial", "remove_bg", "gray_scale", "remove_bg_processing_img",
-                "remove_bg_wait_user_revise"],
+        states=states,
         transitions=[
             {
                 "trigger": "trans",
@@ -31,12 +35,6 @@ def new_machine():
                 "conditions": "is_going_to_gray_scale",
             },
             {
-                "trigger": "trans",
-                "source": ["remove_bg", "gray_scale"],
-                "dest": "initial",
-                "conditions": "is_going_to_initial",
-            },
-            {
                 "trigger": "trans_image",
                 "source": "remove_bg",
                 "dest": "remove_bg_processing_img",
@@ -47,6 +45,17 @@ def new_machine():
                 "source": "remove_bg_wait_user_revise",
                 "dest": "remove_bg_wait_user_revise",
                 "conditions": "is_going_to_remove_bg_processing_img"
+            },
+            {
+                "trigger": "trans",
+                "source": states.copy(),
+                "dest": "initial",
+                "conditions": "is_going_to_initial",
+            },
+            {
+                "trigger": "go_initial",
+                "source": states.copy(),
+                "dest": "initial",
             }
         ],
         initial="initial",
@@ -68,6 +77,7 @@ if channel_secret is None:
 if channel_access_token is None:
     print("Specify LINE_CHANNEL_ACCESS_TOKEN as environment variable.")
     sys.exit(1)
+# print(channel_access_token)
 
 line_bot_api = LineBotApi(channel_access_token)
 parser = WebhookParser(channel_secret)
@@ -163,16 +173,25 @@ def handle_image_message(event):
     user_id = event.source.user_id
     machine = get_user_machine(user_id)
     print(f"\nFSM STATE: {machine.state}")
-    print('message:', event.message.text)
-    response = machine.trans_image(event)
-    if response is False:
-        send_text_message(event.reply_token, f"Not Entering any State: {machine.state}")
+    print('ImageMessageId:', event.message.id)
+    content_path = utils.save_event_image(event)
+    print(content_path)
+    # if response is False:
+    #     send_text_message(event.reply_token, f"Not Entering any State: {machine.state}")
 
 
 @app.route("/show-fsm", methods=["GET"])
 def show_fsm():
-    global_machine.get_graph().draw("fsm.png", prog="dot", format="png")
+    fsm_path = 'fsm.svg'
+    global_machine.get_graph().draw(fsm_path, prog="dot")
+    with open(fsm_path, 'rb') as fr:
+        svg2png(bytestring=fr.read(), write_to='fsm.png')
     return send_file("fsm.png", mimetype="image/png")
+
+
+@app.route('/static/<path:path>', methods=["GET"])
+def send_static(path):
+    return send_file("./static/" + path, mimetype="image/png")
 
 
 if __name__ == "__main__":

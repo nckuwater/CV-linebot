@@ -4,7 +4,11 @@ import numpy as np
 cv = cv2
 
 
-def generate_image_background_mask(image, kernel_size=7, fill_color=(0.0, 0.0, 1.0)):
+def read_path(path):
+    return cv.imread(path)
+
+
+def generate_image_background_mask(image, kernel_size=7):
     """ Apply Gaussian filter """
     # image = image.resize((image.size[0]*2, image.size[1]*2))
     img = np.asarray(image)
