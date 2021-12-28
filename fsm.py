@@ -34,19 +34,23 @@ class TocMachine(GraphMachine):
         text = event.message.text
         return text.strip().lower() == "gscale"
 
-    def is_going_to_remove_bg_wait_user_revise(self, event):
+    def is_going_to_remove_bg_revise_img(self, event):
         text = event.message.text
         if text.strip().lower() == "ok":
-            self.go_initial()
+            # self.go_initial()
             return False
         try:
-            val = int(text)
-            if self.remove_bg_contours == val:
-                return False
             self.remove_bg_contours = int(text)
             return True
         except:
             return False
+
+    def is_going_to_remove_bg_user_ok(self, event):
+        text = event.message.text
+        if text.strip().lower() == 'ok':
+            self.remove_bg_contours = None
+            return True
+        return False
 
     def on_enter_show_state(self, event):
         print(f"showing state: {self.machine.state}")
@@ -62,7 +66,12 @@ class TocMachine(GraphMachine):
         send_text_message(reply_token, "Send an image to process")
 
     def on_enter_remove_bg_processing_img(self, event):
-        # ImageEvent
+        # ImageEvent from remove_bg
+        # or MessageEvent from user reply revise
+        """
+            An short state, exit to wait_user_revise after image send,
+            this checks the self.remove_bg_contours to check if user have already processed a image
+        """
         print(f'handling remove bg image {event.message.id}')
         self.remove_bg_image_path = utils.save_event_image(event)
         print('image saved at:', self.remove_bg_image_path)
@@ -76,7 +85,21 @@ class TocMachine(GraphMachine):
         send_image(reply_token, utils.resolve_static_url(img_path))
         send_text_message(reply_token, 'Type ok if ok, Type number to remove more.')
 
-        self.trans()  # go to wait_user_revise
+        # self.trans()  # go to wait_user_revise
+        self.goto_wait_user_revise()  # go to wait_user_revise
+
+    def on_enter_remove_bg_wait_user_revise(self, event):
+        # dont do revise when first entering
+        # check the stored variable to see if this time is after user request revise
+        # message event, user reply the index.
+        if self.remove_bg_contours is None:
+            # this is the first enter right after processing, just send the result.
+            pass
+        else:
+            # user request to revise
+            pass
+
+
 
     def on_enter_gray_scale(self, event):
         print("I'm entering gray_scale")

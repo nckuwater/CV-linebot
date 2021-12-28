@@ -31,14 +31,26 @@ def new_machine():
             {
                 "trigger": "trans_image",
                 "source": "remove_bg",
-                "dest": "remove_bg_processing_img",
+                "dest": "remove_bg_processing_img",  # send the result, then move to wait_user_revise
             },
-            # from revise to processing, reprocess with user input number.
+            # from revise to processing, reprocess if user reply a number.
+            # return to initial if user says ok.
+            {
+                "trigger": "goto_wait_user_revise",
+                "source": "remove_bg_processing_img",
+                "dest": "remove_bg_wait_user_revise",
+            },
             {
                 "trigger": "trans",
                 "source": "remove_bg_wait_user_revise",
                 "dest": "remove_bg_wait_user_revise",
-                "conditions": "is_going_to_remove_bg_processing_img"
+                "conditions": "is_going_to_remove_bg_revise_img"
+            },
+            {
+                "trigger": "trans",
+                "source": "remove_bg_wait_user_revise",
+                "dest": "initial",
+                "conditions": "is_going_to_remove_bg_user_ok"
             },
             {
                 "trigger": "trans",
@@ -51,18 +63,20 @@ def new_machine():
                 "source": "gray_scale",
                 "dest": "gray_scale_process",
             },
+
+            # Connect all state to initial, make user able to abort any ongoing process.
             {
                 "trigger": "trans",
                 "source": states.copy(),
                 "dest": "initial",
                 "conditions": "is_going_to_initial",
             },
-            {
-                "trigger": "trans",
-                "source": states.copy(),
-                "dest": "show_state",
-                "conditions": "is_going_to_show_state",
-            },
+            # {
+            #     "trigger": "trans",
+            #     "source": states.copy(),
+            #     "dest": "show_state",
+            #     "conditions": "is_going_to_show_state",
+            # },
             {
                 "trigger": "go_initial",
                 "source": states.copy(),
