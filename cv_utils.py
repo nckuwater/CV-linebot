@@ -87,15 +87,39 @@ def generate_image_background_mask(image, kernel_size=7):
     return bg_mask_uint8  # A single tunnel 0,255 image
 
 
+# def apply_transparent_mask(img, mask, fill_color=(0.0, 1.0, 0)):
+#     # img : rgb
+#     # mask: 1dim 255 mask, 1=remain, 0=replace by fill_color
+#     mask_stack = np.dstack([mask] * 3)  # Create 3-channel alpha mask
+#     mask_stack = mask_stack.astype('float32') / 255.0
+#     img = img.astype('float32') / 255.0
+#     masked = (mask_stack * img[:, :, :3]) + ((1 - mask_stack) * fill_color)
+#     masked = (masked * 255).astype('uint8')
+#     return masked
 def apply_transparent_mask(img, mask, fill_color=(0.0, 1.0, 0)):
     # img : rgb
     # mask: 1dim 255 mask, 1=remain, 0=replace by fill_color
+    print(img.shape)
+    print(mask.shape)
+    img = cv2.cvtColor(img.copy(), cv2.COLOR_RGB2RGBA)
+    img[:, :, 3] = mask
+    return img
     mask_stack = np.dstack([mask] * 3)  # Create 3-channel alpha mask
     mask_stack = mask_stack.astype('float32') / 255.0
     img = img.astype('float32') / 255.0
     masked = (mask_stack * img[:, :, :3]) + ((1 - mask_stack) * fill_color)
     masked = (masked * 255).astype('uint8')
     return masked
+
+
+def apply_remove_mask(img, mask, fill_color=(0.0, 1.0, 0)):
+    # use this after apply_transparent_mask, this remove the mask instead of keeping it
+    # return apply_transparent_mask(img, 255 - mask, fill_color)
+    mask = (mask == 0)
+    mask = np.bitwise_and(mask, img[:, :, 3] != 0) * 255
+    img = img.copy()
+    img[:, :, 3] = mask
+    return img
 
 
 def generate_image_background_mask_set(image, kernel_size=7, min_contour_area=100):
@@ -146,19 +170,28 @@ def generate_image_background_mask_set(image, kernel_size=7, min_contour_area=10
     for cinfo in contour_info:
         if cinfo[2] >= min_contour_area:
             valid_contours.append(cinfo)
-    h_interval = 255 / len(valid_contours)
+    h_interval = 180 / len(valid_contours)
     disp_img = img.copy()
-    print(disp_img.shape)
+    label_imgs = []
+    (h, tw, _) = disp_img.shape
+    (_, th), _ = cv2.getTextSize('', cv2.FONT_HERSHEY_SIMPLEX, 0.8, 1)
     for i, cinfo in enumerate(valid_contours):
         mask = np.zeros(edges.shape)
         cv.fillPoly(mask, [cinfo[0]], 255)
         mask = cv.GaussianBlur(mask, (3, 3), 0)
-        rgb_c = hsv_to_rgb((int(i * h_interval), 122, 122))
+        rgb_c = hsv_to_rgb((int(i * h_interval), 200, 220))
         rgb_c = [int(rgb_c[0]), int(rgb_c[1]), int(rgb_c[2])]
 
-        cv.fillPoly(disp_img, [cinfo[0]], rgb_c)
+        label = np.zeros([th, tw, 3], np.uint8)
+        label[:] = list(rgb_c)
+        label = cv2.putText(label, str(i), (5, 12),
+                            cv2.FONT_HERSHEY_SIMPLEX, 0.4, (255, 255, 255), 1)
+        label_imgs.append(label)
+        cv2.fillPoly(disp_img, [cinfo[0]], rgb_c)
         contour_masks.append(mask)
         mask_colors.append(rgb_c)
+
+    disp_img = np.concatenate([disp_img] + label_imgs, axis=0)
 
     max_contour = contour_info[0]  # mentioned above, assume that this is the background.
     mask = np.zeros(edges.shape)
@@ -180,7 +213,6 @@ def hsv_to_rgb(hsv):
     # hsv is 3 255tuple
     # arr = np.float32([[hsv]]) / 255
     arr = np.uint8([[hsv]])
-    print(arr)
     return cv.cvtColor(arr, cv2.COLOR_HSV2RGB)[0, 0]
 
 
@@ -192,5 +224,13 @@ if __name__ == '__main__':
     # hsv = (0, int(80/100*255), int(100/100*255))
     timg = cv2.imread('./test.png')
     disp, ms = generate_image_background_mask_set(timg)
-    cv2.imshow('disp', disp)
+    timg = apply_transparent_mask(timg, ms[0])
+    disp = apply_remove_mask(timg, ms[2])
+
+    cv2.imwrite('./timg.png', timg)
+    cv2.imwrite('./disp.png', disp)
+
+    cv2.imshow('disp', timg)
+
+    cv2.imshow('m0', ms[0])
     cv2.waitKey()
