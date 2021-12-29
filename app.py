@@ -177,6 +177,8 @@ def handle_message(event):
     machine = get_user_machine(user_id)
     print(f"\nFSM STATE: {machine.state}")
     print('message:', event.message.text)
+    if event.message.text.strip().lower() == 'state':
+        send_text_message(event.reply_token, f"current state: {machine.state}")
     response = machine.trans(event)
     if response is False:
         send_text_message(event.reply_token, f"Not Entering any State: {machine.state}")
