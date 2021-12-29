@@ -42,6 +42,18 @@ def send_image(reply_token, image_url):
         preview_image_url=image_url))
 
 
+def send_payload(reply_token, payload):
+    line_bot_api.reply_message(reply_token, payload)
+
+
+def get_text_send_message(text):
+    return TextSendMessage(text=text)
+
+
+def get_image_send_message(image_url):
+    return ImageSendMessage(original_content_url=image_url, preview_image_url=image_url)
+
+
 def resolve_static_url(path):
     return base_url + '/' + path
 
