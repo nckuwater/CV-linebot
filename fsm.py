@@ -38,7 +38,7 @@ class TocMachine(GraphMachine):
     @staticmethod
     def is_going_to_gray_scale(event):
         text = event.message.text
-        return text.strip().lower() == "gscale"
+        return text.strip().lower() == "gray"
 
     def is_going_to_remove_bg_revise_img(self, event):
         text = event.message.text
@@ -59,7 +59,7 @@ class TocMachine(GraphMachine):
         return False
 
     def on_enter_initial(self, event):
-        print(f"state: {self.machine.state}")
+        print(f"state: initial")
         reply_token = event.reply_token
         send_text_message(reply_token, f"current state: {self.machine.state}")
         self.go_initial()
@@ -157,14 +157,13 @@ class TocMachine(GraphMachine):
                 traceback.print_exc()
                 return False
 
-    def on_enter_gray_scale(self, event):
+    def on_enter_gray_scale_wait_image(self, event):
         print("I'm entering gray_scale")
         self.remove_bg_image_path = None
-        self.remove_bg_contour = 1
         reply_token = event.reply_token
-        send_text_message(reply_token, "Send an image to process")
+        send_text_message(reply_token, "請發送圖片")
 
-    def on_enter_gray_scale_process(self, event):
+    def on_enter_gray_scale(self, event):
         print(f'handling gray scale image {event.message.id}')
         gray_scale_input_image_path = utils.save_event_image(event)
         img = cv_utils.read_path(gray_scale_input_image_path)
@@ -172,4 +171,36 @@ class TocMachine(GraphMachine):
         img_path = f'static/images/{event.message.id}_gray.jpg'
         cv_utils.write_path(img_path, img)
         send_image(event.reply_token, utils.resolve_static_url(img_path))
-        self.go_initial()
+        self.task_finished()
+
+    def is_going_to_gaussian_blur_ask_kernel(self, event):
+        text = event.message.text
+        return text.strip().lower() == "gau"
+
+    def is_going_to_gaussian_blur_wait_image(self, event):
+        text = event.message.text
+        try:
+            ksize = int(text)
+            if ksize % 2 == 1:
+                return True
+            return False
+        except:
+            return False
+
+    def on_enter_gaussian_blur_ask_kernel(self, event):
+        send_text_message(event.reply_token, '請輸入kernel大小(須為奇數)')
+
+    def on_enter_gaussian_blur_wait_image(self, event):
+        self.gaussian_kernel_size = int(event.message.text)
+        send_text_message(event.reply_token, '請發送圖片')
+
+    def on_enter_gaussian_blur(self, event):
+        print(f'handling gaussian image {event.message.id}')
+        gaussian_input_image_path = utils.save_event_image(event)
+        img = cv_utils.read_path(gaussian_input_image_path)
+
+        img = cv_utils.do_gaussian(img, self.gaussian_kernel_size)
+        img_path = f'static/images/{event.message.id}_gau.jpg'
+        cv_utils.write_path(img_path, img)
+        send_image(event.reply_token, utils.resolve_static_url(img_path))
+        self.task_finished()

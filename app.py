@@ -14,8 +14,10 @@ from utils import send_text_message
 from cairosvg import svg2png
 
 load_dotenv()
-states = ["initial", "show_state", "remove_bg", "remove_bg_processing_img",
-          "remove_bg_wait_user_revise", "gray_scale", "gray_scale_process"]
+states = ["initial", "show_state",
+          "remove_bg", "remove_bg_processing_img", "remove_bg_wait_user_revise",
+          "gray_scale", "gray_scale_process",
+          "gaussian_blur_ask_kernel", "gaussian_blur_wait_image", "gaussian_blur"]
 
 
 def new_machine():
@@ -52,16 +54,45 @@ def new_machine():
                 "dest": "initial",
                 "conditions": "is_going_to_remove_bg_user_ok"
             },
+            # Gray scale
             {
                 "trigger": "trans",
                 "source": "initial",
-                "dest": "gray_scale",
+                "dest": "gray_scale_wait_image",
                 "conditions": "is_going_to_gray_scale",
             },
             {
                 "trigger": "trans_image",
+                "source": "gray_scale_wait_image",
+                "dest": "gray_scale",
+            },
+            {
+                "trigger": "task_finished",
                 "source": "gray_scale",
-                "dest": "gray_scale_process",
+                "dest": "initial",
+            },
+            # Gaussian Blur
+            {
+                "trigger": "trans",
+                "source": "initial",
+                "dest": "gaussian_blur_ask_kernel",
+                "conditions": "is_going_to_gaussian_blur_ask_kernel",
+            },
+            {
+                "trigger": "trans",
+                "source": "gaussian_blur_ask_kernel",
+                "dest": "gaussian_blur_wait_image",
+                "conditions": "is_going_to_gaussian_blur_wait_image",
+            },
+            {
+                "trigger": "trans_image",
+                "source": "gaussian_blur_wait_image",
+                "dest": "gaussian_blur",
+            },
+            {
+                "trigger": "task_finished",
+                "source": "gaussian_blur",
+                "dest": "initial",
             },
 
             # Connect all state to initial, make user able to abort any ongoing process.
@@ -84,7 +115,7 @@ def new_machine():
             }
         ],
         # initial="initial",
-        initial="remove_bg",
+        initial="initial",
         auto_transitions=False,
         show_conditions=True,
     )

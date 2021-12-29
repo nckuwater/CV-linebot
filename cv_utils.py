@@ -170,6 +170,8 @@ def generate_image_background_mask_set(image, kernel_size=7, min_contour_area=10
     for cinfo in contour_info:
         if cinfo[2] >= min_contour_area:
             valid_contours.append(cinfo)
+    if len(valid_contours) > 10:
+        valid_contours = valid_contours[:10]
     h_interval = 180 / len(valid_contours)
     disp_img = img.copy()
     label_imgs = []
@@ -218,6 +220,10 @@ def hsv_to_rgb(hsv):
 
 def to_gray_scale(img):
     return cv.cvtColor(img, cv.COLOR_RGB2GRAY)
+
+
+def do_gaussian(img, kernel_size=3):
+    return cv.GaussianBlur(img, (kernel_size, kernel_size), 0)
 
 
 if __name__ == '__main__':
