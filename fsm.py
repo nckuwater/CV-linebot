@@ -58,11 +58,14 @@ class TocMachine(GraphMachine):
             return True
         return False
 
-    def on_enter_initial(self, event):
+    # def on_enter_initial(self, event):
+    #     print(f"state: initial")
+    #     reply_token = event.reply_token
+    #     send_text_message(reply_token, f"current state: {self.machine.state}")
+    #     # self.go_initial()
+    def on_enter_initial(self):
         print(f"state: initial")
-        reply_token = event.reply_token
-        send_text_message(reply_token, f"current state: {self.machine.state}")
-        self.go_initial()
+
 
     def on_enter_show_state(self, event):
         print(f"showing state: {self.machine.state}")
@@ -201,6 +204,24 @@ class TocMachine(GraphMachine):
 
         img = cv_utils.do_gaussian(img, self.gaussian_kernel_size)
         img_path = f'static/images/{event.message.id}_gau.jpg'
+        cv_utils.write_path(img_path, img)
+        send_image(event.reply_token, utils.resolve_static_url(img_path))
+        self.task_finished()
+
+    def is_going_to_bilateral(self, event):
+        text = event.message.text
+        return text.strip().lower() == "bil"
+
+    def on_enter_bilateral_wait_image(self, event):
+        send_text_message(event.reply_token, '請發送圖片')
+
+    def on_enter_bilateral(self, event):
+        print(f'handling bilateral image {event.message.id}')
+        bilateral_input_image_path = utils.save_event_image(event)
+        img = cv_utils.read_path(bilateral_input_image_path)
+
+        img = cv_utils.do_bilateral(img)
+        img_path = f'static/images/{event.message.id}_bil.jpg'
         cv_utils.write_path(img_path, img)
         send_image(event.reply_token, utils.resolve_static_url(img_path))
         self.task_finished()

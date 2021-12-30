@@ -226,6 +226,10 @@ def do_gaussian(img, kernel_size=3):
     return cv.GaussianBlur(img, (kernel_size, kernel_size), 0)
 
 
+def do_bilateral(img):
+    return cv2.bilateralFilter(img, 9, 90, 90)
+
+
 if __name__ == '__main__':
     # hsv = (0, int(80/100*255), int(100/100*255))
     timg = cv2.imread('./test.png')

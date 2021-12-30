@@ -17,7 +17,8 @@ load_dotenv()
 states = ["initial", "show_state",
           "remove_bg", "remove_bg_processing_img", "remove_bg_wait_user_revise",
           "gray_scale", "gray_scale_process",
-          "gaussian_blur_ask_kernel", "gaussian_blur_wait_image", "gaussian_blur"]
+          "gaussian_blur_ask_kernel", "gaussian_blur_wait_image", "gaussian_blur",
+          "bilateral_wait_image", "bilateral"]
 
 
 def new_machine():
@@ -94,7 +95,23 @@ def new_machine():
                 "source": "gaussian_blur",
                 "dest": "initial",
             },
-
+            # Bilateral Filter
+            {
+                "trigger": "trans",
+                "source": "initial",
+                "dest": "bilateral_wait_image",
+                "conditions": "is_going_to_bilateral",
+            },
+            {
+                "trigger": "trans_image",
+                "source": "bilateral_wait_image",
+                "dest": "bilateral",
+            },
+            {
+                "trigger": "task_finished",
+                "source": "bilateral",
+                "dest": "initial",
+            },
             # Connect all state to initial, make user able to abort any ongoing process.
             {
                 "trigger": "trans",
