@@ -37,3 +37,6 @@
     ./static/images 用來存放運行時的圖片
 
 ## 使用範例
+
+## State Diagram
+![alt text](https://github.com/nckuwater/CV-linebot/blob/09464302fc29c0b63fde1ed016227914fafbb142/fsm.png?raw=true)

@@ -14,9 +14,9 @@ from utils import send_text_message
 from cairosvg import svg2png
 
 load_dotenv()
-states = ["initial", "show_state",
+states = ["initial",
           "remove_bg", "remove_bg_processing_img", "remove_bg_wait_user_revise",
-          "gray_scale", "gray_scale_process",
+          "gray_scale", "gray_scale_wait_image",
           "gaussian_blur_ask_kernel", "gaussian_blur_wait_image", "gaussian_blur",
           "bilateral_wait_image", "bilateral"]
 
