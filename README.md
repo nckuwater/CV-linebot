@@ -38,5 +38,5 @@
 
 ## 使用範例
 
-## State Diagram
+## State架構圖
 ![alt text](https://github.com/nckuwater/CV-linebot/blob/09464302fc29c0b63fde1ed016227914fafbb142/fsm.png?raw=true)
