@@ -70,7 +70,7 @@ class TocMachine(GraphMachine):
     def on_enter_show_state(self, event):
         print(f"showing state: {self.machine.state}")
         reply_token = event.reply_token
-        send_text_message(reply_token, f"current state: {self.machine.state}")
+        send_text_message(reply_token, f"目前state: {self.machine.state}")
         self.go_initial()
 
     def on_enter_remove_bg(self, event):
@@ -78,7 +78,7 @@ class TocMachine(GraphMachine):
         self.remove_bg_image_path = None
         self.remove_bg_contour = 1
         reply_token = event.reply_token
-        send_text_message(reply_token, "Send an image to process")
+        send_text_message(reply_token, "請發送圖片")
 
     def on_enter_remove_bg_processing_img(self, event):
         # ImageEvent from remove_bg
@@ -123,7 +123,7 @@ class TocMachine(GraphMachine):
         send_payload(reply_token, [
             utils.get_image_send_message(utils.resolve_static_url(disp_img_path)),
             utils.get_image_send_message(utils.resolve_static_url(img_path)),
-            utils.get_text_send_message('Type ok if ok, Type number to remove more.')
+            utils.get_text_send_message("輸入對應號碼移除該顏色區塊, 回覆'ok'結束")
         ])
 
         # self.trans()  # go to wait_user_revise

@@ -256,7 +256,7 @@ def handle_message(event):
     print(f"\nFSM STATE: {machine.state}")
     print('message:', event.message.text)
     if event.message.text.strip().lower() == 'state':
-        send_text_message(event.reply_token, f"current state: {machine.state}")
+        send_text_message(event.reply_token, f"目前state: {machine.state}")
         return
     if event.message.text.strip().lower() == 'help':
         send_help_message(event.reply_token)
