@@ -9,10 +9,12 @@
 使用語言 - python 3.8
 
 ### 主要功能
-* 去除影像背景(有選區塊的功能)
+* 去除影像背景 (有選區塊的功能)
 * 高斯模糊 (可用於去除圖片雜訊)
+* 雙邊濾波 (Bilateral filter, 能平滑圖片且保留較完整的線條)
 * 灰階化
 
+有提供按鈕選項的功能(輸入'help')
 
 ## 建構環境
 **需使用Anaconda安裝部分套件避免錯誤**  
@@ -37,6 +39,10 @@
     ./static/images 用來存放運行時的圖片
 
 ## 使用範例
+
+輸入 'help' 可以有按鈕指令選項，點擊就可以使用指令。  
+輸入 'state' 可以顯示目前state。  
+
 ![alt text](https://github.com/nckuwater/CV-linebot/blob/master/example/rbg1.png?raw=true)
 ![alt text](https://github.com/nckuwater/CV-linebot/blob/master/example/rbg2.png?raw=true)
 ![alt text](https://github.com/nckuwater/CV-linebot/blob/master/example/rbg3.png?raw=true)
