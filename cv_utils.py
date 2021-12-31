@@ -134,7 +134,7 @@ def generate_image_background_mask_set(image, kernel_size=7, min_contour_area=10
 
     """ edge canny """
     # Canny will convert image to grayscale
-    edges = cv.Canny(img, 100, 200)
+    edges = cv.Canny(img, 80, 220)
     # plt.subplot(333), plt.imshow(edges, cmap='gray')
     # kernel size should be odd
     if kernel_size % 2 == 0:

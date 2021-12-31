@@ -5,7 +5,8 @@ from flask import Flask, jsonify, request, abort, send_file
 from dotenv import load_dotenv
 from linebot import LineBotApi, WebhookParser, WebhookHandler
 from linebot.exceptions import InvalidSignatureError
-from linebot.models import MessageEvent, TextMessage, TextSendMessage, ImageMessage
+from linebot.models import MessageEvent, TextMessage, TextSendMessage, ImageMessage, \
+    TemplateSendMessage, ButtonsTemplate, MessageTemplateAction
 
 import utils
 from fsm import TocMachine
@@ -219,6 +220,35 @@ def webhook_handler():
     return "OK"
 
 
+def send_help_message(reply_token):
+    tsm = TemplateSendMessage(
+        alt_text='Buttons template',
+        template=ButtonsTemplate(
+            title='可用選項',
+            text='請選擇功能',
+            actions=[
+                MessageTemplateAction(
+                    label='圖片去背',
+                    text='rbg'
+                ),
+                MessageTemplateAction(
+                    label='灰階化',
+                    text='gray'
+                ),
+                MessageTemplateAction(
+                    label='平滑圖片(高斯模糊)',
+                    text='bil'
+                ),
+                MessageTemplateAction(
+                    label='平滑圖片(Bilateral 線條明顯)',
+                    text='bil'
+                )
+            ]
+        )
+    )
+    line_bot_api.reply_message(reply_token, tsm)
+
+
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
     user_id = event.source.user_id
@@ -227,9 +257,13 @@ def handle_message(event):
     print('message:', event.message.text)
     if event.message.text.strip().lower() == 'state':
         send_text_message(event.reply_token, f"current state: {machine.state}")
+        return
+    if event.message.text.strip().lower() == 'help':
+        send_help_message(event.reply_token)
+        return
     response = machine.trans(event)
     if response is False:
-        send_text_message(event.reply_token, f"Not Entering any State: {machine.state}")
+        send_text_message(event.reply_token, f"沒有指定操作，目前state: {machine.state}")
 
 
 @handler.add(MessageEvent, message=ImageMessage)
