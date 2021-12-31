@@ -78,7 +78,7 @@ class TocMachine(GraphMachine):
         self.remove_bg_image_path = None
         self.remove_bg_contour = 1
         reply_token = event.reply_token
-        send_text_message(reply_token, "請發送圖片")
+        send_text_message(reply_token, "請發送要去背的圖片")
 
     def on_enter_remove_bg_processing_img(self, event):
         # ImageEvent from remove_bg
@@ -164,7 +164,7 @@ class TocMachine(GraphMachine):
         print("I'm entering gray_scale")
         self.remove_bg_image_path = None
         reply_token = event.reply_token
-        send_text_message(reply_token, "請發送圖片")
+        send_text_message(reply_token, "灰階化 - 請發送圖片")
 
     def on_enter_gray_scale(self, event):
         print(f'handling gray scale image {event.message.id}')
@@ -195,7 +195,7 @@ class TocMachine(GraphMachine):
 
     def on_enter_gaussian_blur_wait_image(self, event):
         self.gaussian_kernel_size = int(event.message.text)
-        send_text_message(event.reply_token, '請發送圖片')
+        send_text_message(event.reply_token, '平滑圖片(高斯模糊) - 請發送圖片')
 
     def on_enter_gaussian_blur(self, event):
         print(f'handling gaussian image {event.message.id}')
@@ -213,7 +213,7 @@ class TocMachine(GraphMachine):
         return text.strip().lower() == "bil"
 
     def on_enter_bilateral_wait_image(self, event):
-        send_text_message(event.reply_token, '請發送圖片')
+        send_text_message(event.reply_token, '平滑圖片(bilateral) - 請發送圖片')
 
     def on_enter_bilateral(self, event):
         print(f'handling bilateral image {event.message.id}')

@@ -231,17 +231,31 @@ def do_bilateral(img):
     return cv2.bilateralFilter(img, 9, 90, 90)
 
 
+def add_gaussian_noise(image):
+    row, col, ch = image.shape
+    mean = 0
+    var = 0.01
+    sigma = var ** 0.5
+    gauss = np.random.normal(mean, sigma, (row, col, ch))
+    # gauss = gauss.reshape([row, col, ch])
+    noisy = image + gauss
+    return noisy
+
+
 if __name__ == '__main__':
     # hsv = (0, int(80/100*255), int(100/100*255))
-    timg = cv2.imread('./test.png')
-    disp, ms = generate_image_background_mask_set(timg)
-    timg = apply_transparent_mask(timg, ms[0])
-    disp = apply_remove_mask(timg, ms[2])
+    timg = cv2.imread('./example/test.png')
+    # disp, ms = generate_image_background_mask_set(timg)
+    # timg = apply_transparent_mask(timg, ms[0])
+    # disp = apply_remove_mask(timg, ms[2])
+    #
+    # cv2.imwrite('./timg.png', timg)
+    # cv2.imwrite('./disp.png', disp)
+    #
+    # cv2.imshow('disp', timg)
 
-    cv2.imwrite('./timg.png', timg)
-    cv2.imwrite('./disp.png', disp)
-
-    cv2.imshow('disp', timg)
-
-    cv2.imshow('m0', ms[0])
+    # cv2.imshow('m0', ms[0])
+    gimg = add_gaussian_noise(timg / 255)
+    cv2.imshow('noise', gimg)
+    cv2.imshow('gau', do_gaussian(gimg))
     cv2.waitKey()

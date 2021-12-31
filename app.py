@@ -240,7 +240,7 @@ def send_help_message(reply_token):
                     text='bil'
                 ),
                 MessageTemplateAction(
-                    label='平滑圖片(Bilateral 線條明顯)',
+                    label='平滑圖片(bilateral 線條明顯)',
                     text='bil'
                 )
             ]
