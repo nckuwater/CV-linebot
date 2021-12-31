@@ -33,10 +33,10 @@
     1. LINE_CHANNEL_SECRET=...
     2. LINE_CHANNEL_ACCESS_TOKEN=...
     3. PORT=...
-    4. base_url=https... 就是伺服器的url(尾端沒有\\)
+    4. base_url=https... 就是伺服器的url(尾端沒有'\\')
 
 * 創建資料夾  
-    ./static/images 用來存放運行時的圖片
+    ./static/images 用來存放運行時產生的圖片
 
 ## 使用範例
 
@@ -45,7 +45,7 @@
 * 去除圖片背景  
 ![alt text](https://github.com/nckuwater/CV-linebot/blob/master/example/rbg1.png?raw=true)
 ![alt text](https://github.com/nckuwater/CV-linebot/blob/master/example/rbg2.png?raw=true)
-![alt text](https://github.com/nckuwater/CV-linebot/blob/master/example/rbg3.png?raw=true)  
+![alt text](https://github.com/nckuwater/CV-linebot/blob/master/example/rbg3.png?raw=true)
 
 * 高斯模糊  
 ![alt text](https://github.com/nckuwater/CV-linebot/blob/master/example/gau1.png?raw=true)
@@ -54,6 +54,10 @@
 * 平滑圖片 (bilateral)  
 ![alt text](https://github.com/nckuwater/CV-linebot/blob/master/example/bil1.png?raw=true)
 ![alt text](https://github.com/nckuwater/CV-linebot/blob/master/example/bil2.png?raw=true)
+
+* 灰階化  
+![alt text](https://github.com/nckuwater/CV-linebot/blob/master/example/gray1.png?raw=true)
+![alt text](https://github.com/nckuwater/CV-linebot/blob/master/example/gray2.png?raw=true)
 
 ## State架構圖
 ![alt text](https://github.com/nckuwater/CV-linebot/blob/master/fsm.png?raw=true)
