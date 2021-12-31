@@ -18,7 +18,7 @@ load_dotenv()
 states = ["initial",
           "remove_bg", "remove_bg_processing_img", "remove_bg_wait_user_revise",
           "gray_scale", "gray_scale_wait_image",
-          "gaussian_blur_ask_kernel", "gaussian_blur_wait_image", "gaussian_blur",
+          "gaussian_blur_ask_kernel", "gaussian_blur_wrong_kernel", "gaussian_blur_wait_image", "gaussian_blur",
           "bilateral_wait_image", "bilateral"]
 
 
@@ -79,6 +79,17 @@ def new_machine():
                 "source": "initial",
                 "dest": "gaussian_blur_ask_kernel",
                 "conditions": "is_going_to_gaussian_blur_ask_kernel",
+            },
+            {
+                "trigger": "trans",
+                "source": "gaussian_blur_ask_kernel",
+                "dest": "gaussian_blur_wrong_kernel",
+                "conditions": "is_going_to_gaussian_blur_wrong_kernel",
+            },
+            {
+                "trigger": "trans_internal",
+                "source": "gaussian_blur_wrong_kernel",
+                "dest": "gaussian_blur_ask_kernel",
             },
             {
                 "trigger": "trans",
@@ -237,7 +248,7 @@ def send_help_message(reply_token):
                 ),
                 MessageTemplateAction(
                     label='平滑圖片(高斯模糊)',
-                    text='bil'
+                    text='gau'
                 ),
                 MessageTemplateAction(
                     label='平滑圖片(bilateral 線條明顯)',

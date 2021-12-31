@@ -66,7 +66,6 @@ class TocMachine(GraphMachine):
     def on_enter_initial(self):
         print(f"state: initial")
 
-
     def on_enter_show_state(self, event):
         print(f"showing state: {self.machine.state}")
         reply_token = event.reply_token
@@ -190,8 +189,16 @@ class TocMachine(GraphMachine):
         except:
             return False
 
+    def is_going_to_gaussian_blur_wrong_kernel(self, event):
+        return not self.is_going_to_gaussian_blur_wait_image(event)
+
     def on_enter_gaussian_blur_ask_kernel(self, event):
-        send_text_message(event.reply_token, '請輸入kernel大小(須為奇數)')
+        if event is not None:
+            send_text_message(event.reply_token, '請輸入kernel大小(須為奇數)')
+
+    def on_enter_gaussian_blur_wrong_kernel(self, event):
+        send_text_message(event.reply_token, 'kernel大小須為奇數，請重新輸入')
+        self.trans_internal()
 
     def on_enter_gaussian_blur_wait_image(self, event):
         self.gaussian_kernel_size = int(event.message.text)

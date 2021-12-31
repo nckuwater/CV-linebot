@@ -45,7 +45,10 @@
 * 去除圖片背景  
 ![alt text](https://github.com/nckuwater/CV-linebot/blob/master/example/rbg1.png?raw=true)
 ![alt text](https://github.com/nckuwater/CV-linebot/blob/master/example/rbg2.png?raw=true)
-![alt text](https://github.com/nckuwater/CV-linebot/blob/master/example/rbg3.png?raw=true)
+![alt text](https://github.com/nckuwater/CV-linebot/blob/master/example/rbg3.png?raw=true)  
+* 高斯模糊
+![alt text](https://github.com/nckuwater/CV-linebot/blob/master/example/gau1.png?raw=true)
+![alt text](https://github.com/nckuwater/CV-linebot/blob/master/example/gau2.png?raw=true)  
 * 平滑圖片 (bilateral)  
 ![alt text](https://github.com/nckuwater/CV-linebot/blob/master/example/bil1.png?raw=true)
 ![alt text](https://github.com/nckuwater/CV-linebot/blob/master/example/bil2.png?raw=true)
