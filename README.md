@@ -37,6 +37,9 @@
     ./static/images 用來存放運行時的圖片
 
 ## 使用範例
+![alt text](https://github.com/nckuwater/CV-linebot/blob/master/example/rbg1.png?raw=true)
+![alt text](https://github.com/nckuwater/CV-linebot/blob/master/example/rbg2.png?raw=true)
+![alt text](https://github.com/nckuwater/CV-linebot/blob/master/example/rbg3.png?raw=true)
 
 ## State架構圖
 ![alt text](https://github.com/nckuwater/CV-linebot/blob/master/fsm.png?raw=true)
