@@ -115,8 +115,9 @@ def apply_transparent_mask(img, mask, fill_color=(0.0, 1.0, 0)):
 def apply_remove_mask(img, mask, fill_color=(0.0, 1.0, 0)):
     # use this after apply_transparent_mask, this remove the mask instead of keeping it
     # return apply_transparent_mask(img, 255 - mask, fill_color)
-    mask = (mask == 0)
-    mask = np.bitwise_and(mask, img[:, :, 3] != 0) * 255
+    mask = (255 - mask)
+    # mask = np.bitwise_and(mask, img[:, :, 3] != 0) * 255
+    mask = np.minimum(mask, img[:, :, 3])
     img = img.copy()
     img[:, :, 3] = mask
     return img
