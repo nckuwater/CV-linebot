@@ -24,9 +24,9 @@
 其中pygraphviz  會出錯, 需使用anaconda安裝  
 `conda install -c alubbock pygraphviz`
 
-而裝完之後又會遇到graphviz的內部問題 (例如找不到AGraph.h或graphviz libs)  
-則需安裝python-graphviz  
-`pip install python-graphviz`  
+~~而裝完之後又會遇到graphviz的內部問題 (例如找不到AGraph.h或graphviz libs)~~  
+~~則需安裝python-graphviz~~  
+~~pip install python-graphviz~~  
 
 需配置以下本地檔案
 * 創建.env 並且設定
