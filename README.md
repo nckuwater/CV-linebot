@@ -17,6 +17,8 @@
 有提供按鈕選項的功能(輸入'help')
 
 ## 建構環境
+**安裝graphviz時會發生各種問題，以下步驟可能不適用於所有人。**
+### windows
 **需使用Anaconda安裝部分套件避免錯誤**  
 先安裝requirement.txt的內容  
 `pip install -r requirement.txt`
@@ -24,12 +26,19 @@
 其中pygraphviz  會出錯, 需使用anaconda安裝  
 `conda install -c alubbock pygraphviz`
 
-~~而裝完之後又會遇到graphviz的內部問題 (例如找不到AGraph.h或graphviz libs)~~  
-~~則需安裝python-graphviz~~  
-~~pip install python-graphviz~~  
+而裝完之後又會遇到graphviz的內部問題 (例如找不到AGraph.h或graphviz libs)  
+則需安裝python-graphviz  
+`pip install python-graphviz`  
 
-需配置以下本地檔案
-* 創建.env 並且設定
+### heroku 
+(目前repo正在使用)  
+需在requirements.txt中加入graphviz(已加入)  
+buildpack中加入python  
+並加入 [graphviz buildpack](https://elements.heroku.com/buildpacks/weibeld/heroku-buildpack-graphviz) 到buildpack  
+完成後push即可。
+
+### 需配置以下本地檔案
+* 創建.env 並且設定 (heroku則是設定heroku config)
     1. LINE_CHANNEL_SECRET=...
     2. LINE_CHANNEL_ACCESS_TOKEN=...
     3. PORT=...
